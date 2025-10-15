@@ -1,0 +1,18 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "18.18.0",
+    "sdksVersions": {},
+    "version": "1.21.1",
+    "libraryName": "building-management",
+    "libraryId": "b8d4dc11-7c8e-419c-9a3f-b892840af100",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "buildingManagement",
+    "solutionShortDescription": "buildingManagement description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

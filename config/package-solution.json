@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "building-management-client-side-solution",
+    "id": "b8d4dc11-7c8e-419c-9a3f-b892840af100",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.21.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "buildingManagement description"
+      },
+      "longDescription": {
+        "default": "buildingManagement description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "building-management Feature",
+        "description": "The feature that activates elements of the building-management solution.",
+        "id": "13967f8c-5bf0-4dd5-b525-3d3d0955176d",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/building-management.sppkg"
+  }
+}

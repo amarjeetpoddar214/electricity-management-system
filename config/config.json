@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "building-management-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/buildingManagement/BuildingManagementWebPart.js",
+          "manifest": "./src/webparts/buildingManagement/BuildingManagementWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "BuildingManagementWebPartStrings": "lib/webparts/buildingManagement/loc/{locale}.js"
+  }
+}
