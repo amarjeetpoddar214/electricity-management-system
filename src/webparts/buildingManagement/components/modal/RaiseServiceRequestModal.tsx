@@ -1,6 +1,7 @@
 import * as React from 'react';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Web } from 'sp-pnp-js';
 import { Floor, ServiceRequest } from '../../types';
 
 interface RaiseServiceRequestModalProps {
@@ -10,14 +11,58 @@ interface RaiseServiceRequestModalProps {
   floors: Floor[];
 }
 
+const webURL = 'https://smalsusinfolabs.sharepoint.com/sites/Smalsus';
+const serviceRequestListId = "2cbcadca-df0f-43ef-8cf5-f7d58671e2bd";
+const floorsListId = "a930f9c4-27d5-4e7a-9bc4-fbb8dd605565";
+
 const RaiseServiceRequestModal: React.FC<RaiseServiceRequestModalProps> = ({ isOpen, onClose, onSubmit, floors }) => {
   const [requestDate, setRequestDate] = useState(new Date().toISOString().split('T')[0]);
   const [category, setCategory] = useState<ServiceRequest['category']>('Electrical');
   const [location, setLocation] = useState<string>('');
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
+  const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
+  const [locationOptions, setLocationOptions] = useState<{ id: number; title: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  if (!isOpen) return null;
+
+  useEffect(() => {
+    if (!isOpen) return; // only fetch when modal opens
+
+    const web = new Web(webURL);
+
+    const fetchData = async () => {
+      setLoading(true);
+      setFetchError(null);
+
+      try {
+        // Fetch category choices
+        const categoryField: any = await web.lists
+          .getById(serviceRequestListId)
+          .fields.getByInternalNameOrTitle('category')
+          .get();
+
+        setCategoryOptions(categoryField?.Choices || []);
+
+        // Fetch locations (floors)
+        const locations: any[] = await web.lists
+          .getById(floorsListId)
+          .items.select('Id', 'Title')
+          .getAll();
+
+        setLocationOptions(locations.map(item => ({ id: item.Id, title: item.Title })));
+      } catch (err) {
+        console.error('Error fetching dropdown data:', err);
+        setFetchError('Failed to load dropdown data from SharePoint.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [isOpen]);
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,13 +134,18 @@ const RaiseServiceRequestModal: React.FC<RaiseServiceRequestModalProps> = ({ isO
                     value={category}
                     onChange={(e) => setCategory(e.target.value as ServiceRequest['category'])}
                     className="form-select"
+                    required
                   >
-                    <option>Electrical</option>
-                    <option>Lift</option>
-                    <option>Fire System</option>
-                    <option>Plumbing</option>
-                    <option>General Maintenance</option>
+                    {loading && <option>Loading categories...</option>}
+                    {!loading && categoryOptions.length > 0 ? (
+                      categoryOptions.map(option => (
+                        <option key={option} value={option}>{option}</option>
+                      ))
+                    ) : (
+                      <option value="">No categories found</option>
+                    )}
                   </select>
+
                 </div>
               </div>
               <div>
@@ -110,11 +160,16 @@ const RaiseServiceRequestModal: React.FC<RaiseServiceRequestModalProps> = ({ isO
                   required
                 >
                   <option value="" disabled>Select a location</option>
-                  <option>Common Area</option>
-                  {floors.map(floor => (
-                    <option key={floor.id} value={floor.name}>{floor.name}</option>
-                  ))}
+                  {loading && <option>Loading locations...</option>}
+                  {!loading && locationOptions.length > 0 ? (
+                    locationOptions.map(loc => (
+                      <option key={loc.id} value={loc.title}>{loc.title}</option>
+                    ))
+                  ) : (
+                    <option value="">No locations found</option>
+                  )}
                 </select>
+
               </div>
               <div>
                 <label htmlFor="description" className="form-label">
@@ -147,6 +202,7 @@ const RaiseServiceRequestModal: React.FC<RaiseServiceRequestModalProps> = ({ isO
                   Submit Request
                 </button>
               </div>
+              {fetchError && <div className="alert alert-danger">{fetchError}</div>}
             </form>
           </div>
         </div>

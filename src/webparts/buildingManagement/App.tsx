@@ -14,7 +14,7 @@ import * as React from 'react';
 import { Web } from "sp-pnp-js";
 
 const webURL = 'https://smalsusinfolabs.sharepoint.com/sites/Smalsus';
-const ServiceRequestListId = "2cbcadca-df0f-43ef-8cf5-f7d58671e2bd";
+const serviceRequestListId = "2cbcadca-df0f-43ef-8cf5-f7d58671e2bd";
 
 const App: React.FC = () => {
   const [floors, setFloors] = useLocalStorage<Floor[]>('floors', [
@@ -143,7 +143,7 @@ const App: React.FC = () => {
   const fetchServiceRequestList = async () => {
     try {
       const web = new Web(webURL);
-      const res = await web.lists.getById(ServiceRequestListId).items.select(
+      const res = await web.lists.getById(serviceRequestListId).items.select(
         "Id",
         "requestDate",
         "category",
