@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Floor, Bill, ServiceRequest } from './types';
 import useLocalStorage from './hooks/useLocalStorage';
 import Header from './components/modal/Header';
@@ -11,7 +11,10 @@ import UpdateBillModal from './components/modal/UpdateBillModal';
 import RaiseServiceRequestModal from './components/modal/RaiseServiceRequestModal';
 import UpdateServiceRequestModal from './components/modal/UpdateServiceRequestModal';
 import * as React from 'react';
+import { Web } from "sp-pnp-js";
 
+const webURL = 'https://smalsusinfolabs.sharepoint.com/sites/Smalsus';
+const ServiceRequestListId = "2cbcadca-df0f-43ef-8cf5-f7d58671e2bd";
 
 const App: React.FC = () => {
   const [floors, setFloors] = useLocalStorage<Floor[]>('floors', [
@@ -127,37 +130,61 @@ const App: React.FC = () => {
       paymentMode: 'Credit Card'
     }
   ]);
-  const [serviceRequests, setServiceRequests] = useLocalStorage<ServiceRequest[]>('serviceRequests', [
-    {
-      id: 1,
-      requestDate: '2024-08-10',
-      category: 'Electrical',
-      location: '2nd Floor',
-      description: 'Main circuit breaker is tripping frequently in apartment 203.',
-      status: 'Open',
-    },
-    {
-      id: 2,
-      requestDate: '2024-08-05',
-      category: 'Lift',
-      location: 'Common Area',
-      description: 'Lift B is making a strange noise when moving between floors.',
-      status: 'In Progress',
-    },
-    {
-      id: 3,
-      requestDate: '2024-07-20',
-      category: 'Fire System',
-      location: 'Basement',
-      description: 'Routine inspection and testing of basement smoke detectors.',
-      status: 'Resolved',
-      resolutionDate: '2024-07-22',
-      resolutionNotes: 'All detectors cleaned and tested. Battery replaced in one unit.',
-      paymentAmount: 2500,
-      paymentDate: '2024-07-25',
-      paymentMode: 'Cheque'
+
+
+
+
+  const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
+
+  useEffect(() => {
+    fetchServiceRequestList();
+  }, [])
+
+  const fetchServiceRequestList = async () => {
+    try {
+      const web = new Web(webURL);
+      const res = await web.lists.getById(ServiceRequestListId).items.select(
+        "Id",
+        "requestDate",
+        "category",
+        "location/Id",
+        "location/Title",
+        "descriptionIssue",
+        "status",
+        "paymentAmount",
+        "Title",
+        "resolutionDate",
+        "resolutionNotes",
+        "paymentDate",
+        "paymentMode"
+      ).expand("location").getAll();
+      console.log('Service Request List', res);
+
+      const mappedRequests: ServiceRequest[] = res.map((item: any) => ({
+        id: item.Id.toString(),
+        requestDate: item.requestDate
+          ? new Date(item.requestDate).toISOString().split("T")[0]
+          : "",
+        category: item.category ?? "",
+        location: item.location?.Title ?? "",
+        description: item.descriptionIssue ?? "",
+        status: item.status ?? "",
+        paymentAmount: item.paymentAmount != null ? Number(item.paymentAmount) : 0,
+      }));
+      console.log('After Mapping Service Request List', res);
+
+
+      // 🔹 Step 5: Update state
+      setServiceRequests(mappedRequests);
+    } catch (error) {
+      console.error(error);
     }
-  ]);
+  }
+
+
+
+
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFloorId, setSelectedFloorId] = useState<number | null>(null);
