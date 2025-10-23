@@ -15,7 +15,7 @@ import { Web } from "sp-pnp-js";
 
 const webURL = 'https://smalsusinfolabs.sharepoint.com/sites/Smalsus';
 const serviceRequestListId = "2cbcadca-df0f-43ef-8cf5-f7d58671e2bd";
-const floorsListId = "a930f9c4-27d5-4e7a-9bc4-fbb8dd605565";
+// const floorsListId = "a930f9c4-27d5-4e7a-9bc4-fbb8dd605565";
 
 
 const App: React.FC = () => {
@@ -328,70 +328,29 @@ const App: React.FC = () => {
   };
 
   // Replace your existing handleRaiseServiceRequest with this async version
-  const handleRaiseServiceRequest = async (
-    request: Omit<ServiceRequest, 'id' | 'status'>
-  ) => {
-    const web = new Web(webURL);
-
+  const handleRaiseServiceRequest = async (request: Omit<ServiceRequest, 'id' | 'status'>) => {
     try {
-      // 1) Try to resolve the lookup ID from Floors list (match by Title)
-      // Escape single quotes in Title to safely use in OData filter
-      const escapedTitle = (request.location || '').replace(/'/g, "''");
+      const web = new Web(webURL);
 
-      let locationId: number | null = null;
-      try {
-        const floorMatches: any[] = await web.lists
-          .getById(floorsListId)
-          .items.filter(`Title eq '${escapedTitle}'`)
-          .select('Id')
-          .get();
-
-        if (Array.isArray(floorMatches) && floorMatches.length > 0) {
-          locationId = Number(floorMatches[0].Id);
-        } else {
-          // Not found — leave locationId null
-          locationId = null;
-        }
-      } catch (innerErr) {
-        console.warn('Could not resolve location Id. Proceeding without lookup Id.', innerErr);
-        locationId = null;
-      }
-
-      // 2) Build payload for add. Use internal field names:
-      // - choice field: "category" (you used this earlier)
-      // - lookup field: use <InternalName>Id (locationId) when available
-      // - description internal name appears to be 'descriptionIssue' from your fetch code
-      const payload: any = {
-        Title: request.location || 'Service Request', // Title required in many lists; adjust as needed
+      await web.lists.getById(serviceRequestListId).items.add({
+        Title: "Service Request",
         requestDate: request.requestDate,
         category: request.category,
         descriptionIssue: request.description,
-        status: 'Pending'
-      };
+        locationId: Number(request.location), // ensure ID is numeric
+        status: "Pending"
+      });
 
-      // include lookup Id only if found
-      if (locationId !== null) {
-        // note: SharePoint expects <LookupInternalName>Id
-        payload.locationId = locationId;
-      } else {
-        // if you want to still save the title text in another column, you could set Title or a text column
-        // we already set Title above to the location string
-      }
 
-      // 3) Add item to SharePoint
-      await web.lists.getById(serviceRequestListId).items.add(payload);
-
-      // 4) Refresh local list state by re-fetching from SharePoint
-      await fetchServiceRequestList();
-
-      // close modal and show success
+      alert("Service request submitted successfully!");
+      await fetchServiceRequestList(); // refresh list
       setIsRaiseRequestModalOpen(false);
-      alert('Service request submitted successfully!');
     } catch (error) {
-      console.error('Error adding service request:', error);
-      alert('Failed to submit request. See console for details.');
+      console.error("Error submitting request:", error);
+      alert("Failed to submit request. See console for details.");
     }
   };
+
 
 
   const handleUpdateServiceRequest = (

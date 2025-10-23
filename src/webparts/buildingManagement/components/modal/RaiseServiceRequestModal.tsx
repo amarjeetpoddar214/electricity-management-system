@@ -163,7 +163,7 @@ const RaiseServiceRequestModal: React.FC<RaiseServiceRequestModalProps> = ({ isO
                   {loading && <option>Loading locations...</option>}
                   {!loading && locationOptions.length > 0 ? (
                     locationOptions.map(loc => (
-                      <option key={loc.id} value={loc.title}>{loc.title}</option>
+                      <option key={loc.id} value={loc.id.toString()}>{loc.title}</option>
                     ))
                   ) : (
                     <option value="">No locations found</option>
