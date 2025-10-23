@@ -353,12 +353,42 @@ const App: React.FC = () => {
 
 
 
-  const handleUpdateServiceRequest = (
-    updatedRequest: ServiceRequest
-  ) => {
-    setServiceRequests(prev => prev.map(req => req.id === updatedRequest.id ? updatedRequest : req));
-    setIsUpdateRequestModalOpen(false);
+  // Inside App.tsx or parent component
+  const web = new Web(webURL); // use the same web URL you already have
+
+  const handleUpdateServiceRequest = async (updatedRequest: ServiceRequest) => {
+    try {
+      console.log("Updating request:", updatedRequest);
+
+      // Step 1: Prepare the update payload
+      const payload: any = {
+        status: updatedRequest.status,
+        resolutionDate: updatedRequest.resolutionDate || null,
+        resolutionNotes: updatedRequest.resolutionNotes || null,
+        paymentAmount: updatedRequest.paymentAmount || null,
+        paymentDate: updatedRequest.paymentDate || null,
+        paymentMode: updatedRequest.paymentMode || null
+      };
+
+      // Step 2: Update the item in SharePoint list
+      await web.lists
+        .getById(serviceRequestListId)
+        .items.getById(updatedRequest.id)
+        .update(payload);
+
+      alert("✅ Service request updated successfully!");
+
+      // Step 3: Optionally refetch data or update your local state
+      fetchServiceRequestList();
+      setIsUpdateRequestModalOpen(false);
+
+
+    } catch (error) {
+      console.error("❌ Error updating service request:", error);
+      alert("Failed to update service request. Check console for details.");
+    }
   };
+
 
   const openUpdateRequestModal = (request: ServiceRequest) => {
     setRequestToUpdate(request);

@@ -1,6 +1,10 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { ServiceRequest } from '../../types';
+import { Web } from 'sp-pnp-js';
+
+const webURL = 'https://smalsusinfolabs.sharepoint.com/sites/Smalsus';
+const serviceRequestListId = "2cbcadca-df0f-43ef-8cf5-f7d58671e2bd";
 
 interface UpdateServiceRequestModalProps {
   isOpen: boolean;
@@ -17,8 +21,41 @@ const UpdateServiceRequestModal: React.FC<UpdateServiceRequestModalProps> = ({ i
   const [paymentDate, setPaymentDate] = useState('');
   const [paymentMode, setPaymentMode] = useState('');
   const [error, setError] = useState('');
+  const [statusOptions, setStatusOptions] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
 
   useEffect(() => {
+    if (!isOpen) return;
+
+    const web = new Web(webURL);
+    const fetchDropdownData = async () => {
+      setLoading(true);
+      setFetchError(null);
+
+      try {
+        // 1️⃣ Fetch Status field choices
+        const statusField: any = await web.lists
+          .getById(serviceRequestListId)
+          .fields.getByInternalNameOrTitle('status')
+          .get();
+
+        setStatusOptions(statusField?.Choices || []);
+
+
+
+      } catch (err) {
+        console.error('Error fetching dropdown data:', err);
+        setFetchError('Failed to load dropdown options from SharePoint.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDropdownData();
+
+    // Prefill form when editing an existing record
     if (request) {
       setStatus(request.status);
       setResolutionDate(request.resolutionDate || '');
@@ -26,9 +63,9 @@ const UpdateServiceRequestModal: React.FC<UpdateServiceRequestModalProps> = ({ i
       setPaymentAmount(request.paymentAmount?.toString() || '');
       setPaymentDate(request.paymentDate || '');
       setPaymentMode(request.paymentMode || '');
-      setError('');
     }
-  }, [request]);
+  }, [isOpen, request]);
+
 
   if (!isOpen || !request) return null;
 
@@ -114,12 +151,18 @@ const UpdateServiceRequestModal: React.FC<UpdateServiceRequestModalProps> = ({ i
                   value={status}
                   onChange={(e) => setStatus(e.target.value as ServiceRequest['status'])}
                   className="form-select"
+                  required
                 >
-                  <option>Open</option>
-                  <option>In Progress</option>
-                  <option>Resolved</option>
-                  <option>Cancelled</option>
+                  {loading && <option>Loading status...</option>}
+                  {!loading && statusOptions.length > 0 ? (
+                    statusOptions.map(option => (
+                      <option key={option} value={option}>{option}</option>
+                    ))
+                  ) : (
+                    <option>No statuses found</option>
+                  )}
                 </select>
+
               </div>
 
               {status === 'Resolved' && (
@@ -193,9 +236,17 @@ const UpdateServiceRequestModal: React.FC<UpdateServiceRequestModalProps> = ({ i
                       value={paymentMode}
                       onChange={(e) => setPaymentMode(e.target.value)}
                       className="form-control"
+                      list="payment-mode-options"
                       placeholder="e.g., Cash, Online Transfer"
                     />
+                    <datalist id="payment-mode-options">
+                      <option value="Cash" />
+                      <option value="Online Transfer" />
+                      <option value="Cheque" />
+                      <option value="UPI" />
+                    </datalist>
                   </div>
+
                 </div>
               )}
               {error && <div className="alert alert-danger p-2 small mt-3">{error}</div>}
@@ -216,6 +267,7 @@ const UpdateServiceRequestModal: React.FC<UpdateServiceRequestModalProps> = ({ i
                 Save Changes
               </button>
             </div>
+            {fetchError && <div className="alert alert-danger">{fetchError}</div>}
           </form>
         </div>
       </div>
