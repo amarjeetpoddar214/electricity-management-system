@@ -15,93 +15,11 @@ import { Web } from "sp-pnp-js";
 
 const webURL = 'https://smalsusinfolabs.sharepoint.com/sites/Smalsus';
 const serviceRequestListId = "2cbcadca-df0f-43ef-8cf5-f7d58671e2bd";
-// const floorsListId = "a930f9c4-27d5-4e7a-9bc4-fbb8dd605565";
-
+const readingListId = "7bd5408f-b950-4609-adf2-ea11c2a14e22";
+const floorsListId = "a930f9c4-27d5-4e7a-9bc4-fbb8dd605565";
 
 const App: React.FC = () => {
-  const [floors, setFloors] = useLocalStorage<Floor[]>('floors', [
-    {
-      id: 1, name: 'Basement', readings: [
-        { id: 101, date: '2024-06-15', reading: 23000, unitsConsumed: 0 },
-        { id: 102, date: '2024-06-28', reading: 23150, unitsConsumed: 150 },
-        { id: 103, date: '2024-07-10', reading: 23280, unitsConsumed: 130 },
-        { id: 104, date: '2024-07-25', reading: 23410, unitsConsumed: 130 },
-        { id: 105, date: '2024-08-05', reading: 23562, unitsConsumed: 152 },
-      ]
-    },
-    {
-      id: 2, name: 'Ground Floor', readings: [
-        { id: 201, date: '2024-06-15', reading: 112000, unitsConsumed: 0 },
-        { id: 202, date: '2024-06-29', reading: 112350, unitsConsumed: 350 },
-        { id: 203, date: '2024-07-12', reading: 112700, unitsConsumed: 350 },
-        { id: 204, date: '2024-07-28', reading: 113140, unitsConsumed: 440 },
-        { id: 205, date: '2024-08-08', reading: 113500, unitsConsumed: 360 },
-      ]
-    },
-    {
-      id: 3, name: '1st Floor', readings: [
-        { id: 301, date: '2024-06-16', reading: 87000, unitsConsumed: 0 },
-        { id: 302, date: '2024-06-30', reading: 87250, unitsConsumed: 250 },
-        { id: 303, date: '2024-07-14', reading: 87555, unitsConsumed: 305 },
-        { id: 304, date: '2024-07-29', reading: 87855, unitsConsumed: 300 },
-        { id: 305, date: '2024-08-09', reading: 88130, unitsConsumed: 275 },
-      ]
-    },
-    {
-      id: 4, name: '2nd Floor', readings: [
-        { id: 401, date: '2024-06-14', reading: 92000, unitsConsumed: 0 },
-        { id: 402, date: '2024-06-28', reading: 92205, unitsConsumed: 205 },
-        { id: 403, date: '2024-07-11', reading: 92410, unitsConsumed: 205 },
-        { id: 404, date: '2024-07-26', reading: 92635, unitsConsumed: 225 },
-        { id: 405, date: '2024-08-07', reading: 92815, unitsConsumed: 180 },
-      ]
-    },
-    {
-      id: 5, name: '3rd Floor', readings: [
-        { id: 501, date: '2024-06-18', reading: 76000, unitsConsumed: 0 },
-        { id: 502, date: '2024-06-29', reading: 76210, unitsConsumed: 210 },
-        { id: 503, date: '2024-07-15', reading: 76515, unitsConsumed: 305 },
-        { id: 504, date: '2024-07-30', reading: 76800, unitsConsumed: 285 },
-        { id: 505, date: '2024-08-10', reading: 76965, unitsConsumed: 165 },
-      ]
-    },
-    {
-      id: 6, name: '4th Floor', readings: [
-        { id: 601, date: '2024-06-13', reading: 65000, unitsConsumed: 0 },
-        { id: 602, date: '2024-06-27', reading: 65210, unitsConsumed: 210 },
-        { id: 603, date: '2024-07-13', reading: 65510, unitsConsumed: 300 },
-        { id: 604, date: '2024-07-28', reading: 65820, unitsConsumed: 310 },
-        { id: 605, date: '2024-08-09', reading: 65990, unitsConsumed: 170 },
-      ]
-    },
-    {
-      id: 7, name: 'Lift', readings: [
-        { id: 701, date: '2024-06-15', reading: 150000, unitsConsumed: 0 },
-        { id: 702, date: '2024-06-30', reading: 150145, unitsConsumed: 145 },
-        { id: 703, date: '2024-07-16', reading: 150300, unitsConsumed: 155 },
-        { id: 704, date: '2024-07-31', reading: 150450, unitsConsumed: 150 },
-        { id: 705, date: '2024-08-11', reading: 150592, unitsConsumed: 142 },
-      ]
-    },
-    {
-      id: 8, name: 'Pump Room', readings: [
-        { id: 801, date: '2024-06-15', reading: 55000, unitsConsumed: 0 },
-        { id: 802, date: '2024-06-29', reading: 55200, unitsConsumed: 200 },
-        { id: 803, date: '2024-07-17', reading: 55540, unitsConsumed: 340 },
-        { id: 804, date: '2024-07-30', reading: 55830, unitsConsumed: 290 },
-        { id: 805, date: '2024-08-12', reading: 56050, unitsConsumed: 220 },
-      ]
-    },
-    {
-      id: 9, name: 'Charging Station', readings: [
-        { id: 901, date: '2024-06-15', reading: 4000, unitsConsumed: 0 },
-        { id: 902, date: '2024-06-28', reading: 4450, unitsConsumed: 450 },
-        { id: 903, date: '2024-07-15', reading: 5100, unitsConsumed: 650 },
-        { id: 904, date: '2024-07-29', reading: 5620, unitsConsumed: 520 },
-        { id: 905, date: '2024-08-10', reading: 6200, unitsConsumed: 580 },
-      ]
-    },
-  ]);
+  const [floors, setFloors] = useLocalStorage<Floor[]>('floors', []);
   const [bills, setBills] = useLocalStorage<Bill[]>('bills', [
     {
       monthYear: '2024-08',
@@ -184,6 +102,63 @@ const App: React.FC = () => {
   }
 
 
+  // helper to convert SharePoint item to a reading object used in UI
+  const mapSPReadingToLocal = (item: any) => ({
+    id: item.Id ? String(item.Id) : String(Date.now()),
+    date: item.readingDate ? new Date(item.readingDate).toISOString().split('T')[0] : '',
+    reading: item.readingValue != null ? Number(item.readingValue) : 0,
+    unitsConsumed: item.unitsConsumed != null ? Number(item.unitsConsumed) : 0,
+  });
+
+  const fetchFloorsAndReadings = async () => {
+    try {
+      const web = new Web(webURL);
+
+      // 1) fetch floors (lookup list)
+      const floorsRes: any[] = await web.lists.getById(floorsListId).items.select("Id", "Title").getAll();
+
+      // build a map of floors
+      const floorsMap: { [id: number]: { id: number; name: string; readings: any[] } } = {};
+      floorsRes.forEach(f => {
+        floorsMap[f.Id] = { id: f.Id, name: f.Title, readings: [] };
+      });
+
+      // 2) fetch readings and expand lookup field
+      // Ensure you select floorLookup/Id and floorLookup/Title and the reading fields
+      const readingsRes: any[] = await web.lists
+        .getById(readingListId)
+        .items.select("Id", "Title", "readingDate", "readingValue", "unitsConsumed", "floorLookup/Id", "floorLookup/Title")
+        .expand("floorLookup")
+        .getAll();
+
+      // 3) assign readings to their floors
+      readingsRes.forEach(r => {
+        const floorId = r.floorLookup?.Id;
+        if (floorId && floorsMap[floorId]) {
+          floorsMap[floorId].readings.push(mapSPReadingToLocal(r));
+        }
+      });
+
+      // 4) create sorted floors array
+      const floorsArr = Object.values(floorsMap).map(f => ({
+        id: f.id,
+        name: f.name,
+        readings: f.readings.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+      }));
+
+      // update state (and localStorage)
+      setFloors(floorsArr);
+
+    } catch (error) {
+      console.error("Error fetching floors/readings:", error);
+    }
+  };
+
+  // fetch on mount
+  useEffect(() => {
+    fetchFloorsAndReadings();
+    fetchServiceRequestList(); // keep your existing service request fetch
+  }, []);
 
 
 
@@ -209,61 +184,105 @@ const App: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  const handleAddReading = (date: string, readingValue: number) => {
+  const handleAddReading = async (date: string, readingValue: number) => {
     if (selectedFloorId === null) return;
 
-    setFloors(prevFloors => {
-      return prevFloors.map(floor => {
-        if (floor.id === selectedFloorId) {
-          const lastReading = floor.readings.length > 0 ? floor.readings[floor.readings.length - 1] : null;
-          const unitsConsumed = lastReading ? readingValue - lastReading.reading : 0;
+    try {
+      const web = new Web(webURL);
 
-          const newReading = {
-            id: Date.now(),
-            date,
-            reading: readingValue,
-            unitsConsumed: unitsConsumed > 0 ? unitsConsumed : 0,
-          };
+      // Find the selected floor in state
+      const selectedFloor = floors.find(floor => floor.id === selectedFloorId);
+      if (!selectedFloor) {
+        alert("Floor not found!");
+        return;
+      }
 
-          const updatedReadings = [...floor.readings, newReading].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      // Get the last reading to calculate units consumed
+      const lastReading = selectedFloor.readings.length > 0
+        ? selectedFloor.readings[selectedFloor.readings.length - 1]
+        : null;
 
-          return { ...floor, readings: updatedReadings };
-        }
-        return floor;
-      });
-    });
+      const unitsConsumed = lastReading ? readingValue - lastReading.reading : 0;
+
+      console.log('unitsConsumed', unitsConsumed);
+
+
+      // Prepare the payload for SharePoint
+      const newReadingItem = {
+        Title: `Reading for ${selectedFloor.name}`,
+        floorLookupId: selectedFloorId,     // 🔹 lookup column name + 'Id'
+        readingDate: date,                  // 🔹 DateTime column
+        readingValue: readingValue,         // 🔹 Number column
+        unitsConsumed: unitsConsumed > 0 ? unitsConsumed : 0, // 🔹 Number column
+      };
+
+
+      // Add to SharePoint list
+      const addedItem = await web.lists.getById(readingListId).items.add(newReadingItem);
+
+      console.log("✅ Reading added successfully:", addedItem);
+
+      // Optional: refresh floors & readings from SharePoint
+      await fetchFloorsAndReadings();
+
+      alert("✅ Reading added successfully!");
+    } catch (error) {
+      console.error("❌ Error adding reading:", error);
+      alert("Failed to add reading. See console for details.");
+    }
 
     closeAddReadingModal();
   };
+
 
   const toggleView = () => setView(prev => prev === 'floors' ? 'dashboard' : 'floors');
 
   const openBulkModal = () => setIsBulkModalOpen(true);
   const closeBulkModal = () => setIsBulkModalOpen(false);
 
-  const handleBulkAddReadings = (date: string, readings: { [floorId: number]: number }) => {
-    setFloors(prevFloors => {
-      return prevFloors.map(floor => {
-        if (readings[floor.id] !== undefined) {
-          const readingValue = readings[floor.id];
-          const lastReading = floor.readings.length > 0 ? floor.readings[floor.readings.length - 1] : null;
-          const unitsConsumed = lastReading ? readingValue - lastReading.reading : 0;
+  const handleBulkAddReadings = async (date: string, readings: { [floorId: number]: number }) => {
+    try {
+      const web = new Web(webURL);
 
-          const newReading = {
-            id: Date.now() + floor.id,
-            date,
-            reading: readingValue,
-            unitsConsumed: unitsConsumed > 0 ? unitsConsumed : 0,
-          };
+      // Loop through each floor and add reading if provided
+      const promises = floors.map(async (floor) => {
+        const readingValue = readings[floor.id];
+        if (readingValue === undefined) return; // skip floors with no reading entered
 
-          const updatedReadings = [...floor.readings, newReading].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-          return { ...floor, readings: updatedReadings };
-        }
-        return floor;
+        const lastReading = floor.readings.length > 0
+          ? floor.readings[floor.readings.length - 1]
+          : null;
+
+        const unitsConsumed = lastReading ? readingValue - lastReading.reading : 0;
+
+        // Prepare item for SharePoint
+        const newReadingItem = {
+          Title: `Reading for ${floor.name}`,
+          floorLookupId: floor.id, // lookup column id
+          readingDate: date,
+          readingValue: readingValue,
+          unitsConsumed: unitsConsumed > 0 ? unitsConsumed : 0,
+        };
+
+        // Add item into SharePoint
+        await web.lists.getById(readingListId).items.add(newReadingItem);
       });
-    });
+
+      // Wait for all async add operations to complete
+      await Promise.all(promises);
+
+      // Refresh readings after saving
+      await fetchFloorsAndReadings();
+
+      alert("✅ Bulk readings added successfully!");
+    } catch (error) {
+      console.error("❌ Error adding bulk readings:", error);
+      alert("Failed to add some readings. Check console for details.");
+    }
+
     closeBulkModal();
   };
+
 
   const openBillModal = () => setIsBillModalOpen(true);
   const closeBillModal = () => setIsBillModalOpen(false);
